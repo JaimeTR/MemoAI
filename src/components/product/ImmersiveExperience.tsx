@@ -264,7 +264,7 @@ export function ImmersiveExperience({ onBuyClick }: { onBuyClick: () => void }) 
       <div
         ref={pinnedRef}
         className="h-screen w-full overflow-hidden relative"
-        style={{ background: "radial-gradient(ellipse at 50% 45%, rgba(99,102,241,0.04) 0%, rgba(5,5,5,1) 65%)" }}
+        style={{ background: "transparent" }}
       >
         {/* PRODUCT - always centered, behind everything */}
         <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">

@@ -1,0 +1,77 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "11px",
+        "createdAt": "2026-08-21T01:13:41.258Z",
+        "reason": "critique's accessibility floor is 11px; this badge micro-text was bumped from 10px to comply, kept off main label scale intentionally as a compact discount-badge exception"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-08-21T01:18:18.909Z",
+        "reason": "class definitions kept intentionally scoped to logo wordmark + the 2 price displays (Offer, CheckoutModal) per DESIGN.md's Glow Hierarchy / gradient-text Don't rule; all decorative headline usages were removed this session"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#312e81",
+        "createdAt": "2026-08-21T01:18:18.991Z",
+        "reason": "gradient stop for the logo/price gradient-text, not a standalone UI color; primary is #6366f1 in DESIGN.md"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#065f46",
+        "createdAt": "2026-08-21T01:18:19.072Z",
+        "reason": "gradient stop for gradient-text-green (Solution section logo), secondary is #10b981 in DESIGN.md"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#34d399",
+        "createdAt": "2026-08-21T01:18:19.154Z",
+        "reason": "gradient stop for gradient-text-green (Solution section logo), secondary is #10b981 in DESIGN.md"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "7px",
+        "files": [
+          "src/components/product/FloatingProduct.tsx"
+        ],
+        "createdAt": "2026-08-21T01:42:15.019Z",
+        "reason": "decorative REC label engraved on the illustrative device mockup, not readable UI copy; matches real recorder hardware micro-print scale"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "9px",
+        "files": [
+          "src/components/product/FloatingProduct.tsx"
+        ],
+        "createdAt": "2026-08-21T01:42:15.100Z",
+        "reason": "same decorative REC label, md breakpoint"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "8px",
+        "files": [
+          "src/components/product/FloatingProduct.tsx"
+        ],
+        "createdAt": "2026-08-21T01:42:15.181Z",
+        "reason": "decorative brand engraving on device mockup (MemoAI wordmark on the illustrated hardware), not readable UI copy"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "files": [
+          "src/components/product/FloatingProduct.tsx"
+        ],
+        "createdAt": "2026-08-21T01:42:15.263Z",
+        "reason": "same decorative brand engraving, md breakpoint"
+      }
+    ]
+  }
+}

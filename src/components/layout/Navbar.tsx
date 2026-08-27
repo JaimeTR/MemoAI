@@ -1,33 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 const navItems = [
-  { label: "Problema", scene: 1 },
-  { label: "Beneficios", scene: 2 },
-  { label: "Funciona", scene: 3 },
-  { label: "Usos", scene: 4 },
-  { label: "Comprar", scene: 6 },
+  { label: "SOLUCIÓN", id: "beneficios" },
+  { label: "FUNCIONA", id: "how-it-works" },
+  { label: "USOS", id: "usos" },
+  { label: "FAQ", id: "faq" },
 ];
 
-export function Navbar() {
-  const [visible, setVisible] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+interface NavbarProps {
+  onBuyClick?: () => void;
+}
 
-  const lastScrollY = useRef(0);
+export function Navbar({ onBuyClick }: NavbarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > 300 && currentY > lastScrollY.current) {
-        setVisible(true);
-      } else if (currentY < 200) {
-        setVisible(false);
-      }
-      lastScrollY.current = currentY;
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -37,77 +32,82 @@ export function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const scrollToScene = useCallback((scene: number) => {
+  const scrollToId = useCallback((id: string) => {
     setMobileOpen(false);
-    // Find the ImmersiveExperience container
-    const container = document.querySelector("[data-scene-container]");
-    if (!container) return;
-    const containerTop = container.getBoundingClientRect().top + window.scrollY;
-    // Each scene is ~450/6 = 75vh of scroll. Total scroll = 500% of viewport.
-    // Scenes: 0-16%, 14-32%, 30-48%, 46-64%, 62-82%, 78-100%
-    const sceneStarts = [0, 14, 30, 46, 62, 78, 90];
-    const pct = sceneStarts[scene] / 100;
-    // Container height is 550vh. The scrollable distance is 550vh = 5.5 * window height
-    const vh = window.innerHeight;
-    const scrollDistance = 6.0 * vh;
-    const targetScroll = containerTop + scrollDistance * pct;
-    window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
+
+  const handleBuyClick = useCallback(() => {
+    setMobileOpen(false);
+    onBuyClick?.();
+  }, [onBuyClick]);
 
   return (
     <>
-      <AnimatePresence>
-        {visible && (
-          <motion.nav
-            className="fixed top-3 left-4 right-4 z-50 px-5 py-3 rounded-2xl shadow-2xl"
-            style={{
-              background: "rgba(10, 10, 10, 0.8)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            }}
-            initial={{ y: -80, opacity: 0, scale: 0.95 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -80, opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <a href="#" className="text-xl font-bold tracking-tight inline-flex items-center" style={{ fontFamily: '"Braze", sans-serif' }} onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-                <span className="text-foreground">MEMO</span>
-                <span className="gradient-text relative">
-                  AI
-                  <Sparkles className="absolute -top-2 -right-4 w-3.5 h-3.5 text-accent-light" />
-                </span>
-              </a>
+      <motion.nav
+        className="fixed left-0 right-0 z-50"
+        initial={false}
+        animate={{ top: scrolled ? 12 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {/* Background pill — fixed shape/size always, only opacity fades. Never grows to full width, so no "flash" of an expanding bar. */}
+        <motion.div
+          className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[92%] max-w-3xl rounded-2xl pointer-events-none"
+          style={{
+            background: "rgba(255, 255, 255, 0.8)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+          }}
+          initial={false}
+          animate={{ opacity: scrolled ? 1 : 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+        />
 
-              <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-6">
-                  {navItems.map((item) => (
-                    <button
-                      key={item.label}
-                      onClick={() => scrollToScene(item.scene)}
-                      className={`text-sm text-text-muted hover:text-foreground transition-colors cursor-pointer ${
-                        item.label === "Comprar"
-                          ? "px-4 py-2 rounded-full bg-accent hover:bg-accent-light text-white font-medium"
-                          : ""
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
+        {/* Content row — realigns between hero-width (static) and compact pill-width (scrolled) on the same timeline as `top` */}
+        <motion.div
+          className="relative flex items-center justify-between py-3 mx-auto"
+          initial={false}
+          animate={{
+            maxWidth: scrolled ? 768 : 1152,
+            paddingLeft: scrolled ? 24 : 16,
+            paddingRight: scrolled ? 24 : 16,
+          }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <a href="#" className="inline-flex items-center" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+            <Logo size="sm" />
+          </a>
 
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-6">
+              {navItems.map((item) => (
                 <button
-                  className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer md:hidden"
-                  onClick={() => setMobileOpen(!mobileOpen)}
+                  key={item.label}
+                  onClick={() => scrollToId(item.id)}
+                  className="text-sm text-text-muted hover:text-foreground transition-colors cursor-pointer"
                 >
-                  {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                  {item.label}
                 </button>
-              </div>
+              ))}
+              <button
+                onClick={handleBuyClick}
+                className="text-sm px-4 py-2 rounded-full bg-accent hover:bg-accent-light text-white font-medium animate-pulse-glow cursor-pointer transition-colors"
+              >
+                COMPRAR
+              </button>
             </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+
+            <button
+              className="w-9 h-9 rounded-full bg-foreground/5 flex items-center justify-center hover:bg-foreground/10 transition-colors cursor-pointer md:hidden"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          </div>
+        </motion.div>
+      </motion.nav>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -115,33 +115,31 @@ export function Navbar() {
           <motion.div
             className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-6"
             style={{
-              background: "rgba(5, 5, 5, 0.97)",
+              background: "rgba(255, 255, 255, 0.97)",
               backdropFilter: "blur(30px)",
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <a href="#" className="text-2xl font-bold tracking-tight inline-flex items-center mb-2" style={{ fontFamily: '"Braze", sans-serif' }} onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); setMobileOpen(false); }}>
-              <span className="text-foreground">MEMO</span>
-              <span className="gradient-text relative">
-                AI
-                <Sparkles className="absolute -top-2 -right-5 w-4 h-4 text-accent-light" />
-              </span>
-            </a>
+            <a href="#" className="mb-2" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); setMobileOpen(false); }}>
+                <Logo size="lg" />
+              </a>
             {navItems.map((item) => (
               <button
                 key={item.label}
-                onClick={() => scrollToScene(item.scene)}
-                className={`text-xl font-medium transition-colors cursor-pointer ${
-                  item.label === "Comprar"
-                    ? "px-8 py-3 rounded-full bg-accent hover:bg-accent-light text-white mt-2"
-                    : "text-text-muted hover:text-foreground"
-                }`}
+                onClick={() => scrollToId(item.id)}
+                className="text-xl font-medium text-text-muted hover:text-foreground transition-colors cursor-pointer"
               >
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={handleBuyClick}
+              className="px-8 py-3 rounded-full bg-accent hover:bg-accent-light text-white text-xl font-medium mt-2 cursor-pointer transition-colors"
+            >
+              COMPRAR
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

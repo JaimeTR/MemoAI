@@ -13,9 +13,9 @@ const variants = {
   primary:
     "bg-accent hover:bg-accent-light text-white shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)]",
   secondary:
-    "glass text-foreground hover:bg-white/10",
+    "glass text-foreground shadow-[0_8px_24px_rgba(10,10,10,0.1)] hover:shadow-[0_10px_30px_rgba(10,10,10,0.14)] hover:bg-white/90",
   ghost:
-    "text-text-muted hover:text-foreground hover:bg-white/5",
+    "text-text-muted hover:text-foreground hover:bg-foreground/5",
 };
 
 const sizes = {

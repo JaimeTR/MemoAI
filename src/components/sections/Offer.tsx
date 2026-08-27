@@ -4,27 +4,42 @@ import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
-import { Truck, Shield, Headphones, Zap } from "lucide-react";
+import { Truck, ShieldCheck, MessageCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { PRODUCT } from "@/lib/constants";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const OFFER_DEADLINE_KEY = "memoai_offer_deadline";
+const OFFER_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function getOfferDeadline(): number {
+  const stored = Number(localStorage.getItem(OFFER_DEADLINE_KEY));
+  if (stored && stored > Date.now()) return stored;
+  const deadline = Date.now() + OFFER_WINDOW_MS;
+  localStorage.setItem(OFFER_DEADLINE_KEY, String(deadline));
+  return deadline;
+}
+
+function msToParts(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  return { hours: Math.floor(total / 3600), minutes: Math.floor((total % 3600) / 60), seconds: total % 60 };
+}
+
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) { seconds = 59; minutes--; }
-        if (minutes < 0) { minutes = 59; hours--; }
-        if (hours < 0) { hours = 23; minutes = 59; seconds = 59; }
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
+    let deadline: number;
+    try {
+      deadline = getOfferDeadline();
+    } catch {
+      deadline = Date.now() + OFFER_WINDOW_MS;
+    }
+    const tick = () => setTimeLeft(msToParts(deadline - Date.now()));
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -41,14 +56,18 @@ function CountdownTimer() {
           <div className="w-16 h-16 rounded-xl bg-surface border border-accent/20 flex items-center justify-center text-2xl font-bold font-mono">
             {pad(unit.value)}
           </div>
-          <span className="text-[10px] text-text-muted mt-1 block">{unit.label}</span>
+          <span className="text-[11px] text-text-muted mt-1 block">{unit.label}</span>
         </div>
       ))}
     </div>
   );
 }
 
-export function Offer() {
+interface OfferProps {
+  onBuyClick: () => void;
+}
+
+export function Offer({ onBuyClick }: OfferProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const discount = Math.round((1 - PRODUCT.salePrice / PRODUCT.originalPrice) * 100);
 
@@ -99,7 +118,7 @@ export function Offer() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="offer" className="relative py-32 px-4 bg-background/80 backdrop-blur-sm">
+    <section ref={sectionRef} id="offer" className="relative py-20 md:py-32 px-4 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.1),transparent_60%)]" />
 
       <div className="max-w-2xl mx-auto">
@@ -117,8 +136,8 @@ export function Offer() {
             </Badge>
           </div>
 
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Obtén <span className="gradient-text">MemoAI</span> hoy
+          <h2 className="font-heading text-3xl md:text-5xl font-bold mb-4">
+            Obtén <span className="text-accent">MemoAI</span> hoy
           </h2>
           <p className="text-text-muted mb-8">
             Aprovecha el precio de lanzamiento antes de que termine.
@@ -140,7 +159,7 @@ export function Offer() {
             <Button
               size="lg"
               className="w-full text-lg"
-              onClick={() => document.getElementById("checkout-trigger")?.click()}
+              onClick={onBuyClick}
             >
               COMPRAR AHORA
             </Button>
@@ -148,8 +167,8 @@ export function Offer() {
             <div className="grid grid-cols-3 gap-4 mt-8">
               {[
                 { icon: Truck, label: "Envío gratis" },
-                { icon: Shield, label: "1 año garantía" },
-                { icon: Headphones, label: "Soporte 24/7" },
+                { icon: ShieldCheck, label: "Pago 100% seguro" },
+                { icon: MessageCircle, label: "Soporte por WhatsApp" },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center gap-2 text-center">
                   <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -158,6 +177,23 @@ export function Offer() {
                   <span className="text-xs text-text-muted">{item.label}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Payment methods */}
+            <div className="mt-8 pt-6 border-t border-border/50">
+              <p className="text-[11px] md:text-xs text-text-muted mb-3 text-center uppercase tracking-wider">
+                Pagos 100% seguros
+              </p>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                {["Yape", "Plin", "WhatsApp", "Visa", "Mastercard"].map((method) => (
+                  <span key={method} className="px-3 py-1.5 rounded-lg bg-foreground/5 text-foreground/70 text-xs font-bold">
+                    {method}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[11px] text-text-muted/60 mt-3 text-center">
+                🔒 Tus datos están protegidos · Pago procesado por Culqi/Mercado Pago/Izipay
+              </p>
             </div>
           </div>
         </motion.div>

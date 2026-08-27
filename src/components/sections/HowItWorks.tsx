@@ -76,24 +76,24 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-32 px-4 bg-background/80 backdrop-blur-sm">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(99,102,241,0.06),transparent_60%)]" />
+    <section ref={sectionRef} className="relative py-20 md:py-32 px-4 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent pointer-events-none" />
 
       <div className="max-w-4xl mx-auto">
         <motion.div
-          className="how-title text-center mb-20"
+          className="how-title text-center mb-12 md:mb-20"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-sm font-mono text-accent uppercase tracking-widest mb-4 block">
+          <span className="text-xs md:text-sm font-mono text-accent/80 uppercase tracking-[0.2em] mb-4 block">
             Cómo funciona
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            5 pasos. <span className="gradient-text">Cero esfuerzo.</span>
+          <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
+            5 pasos. <span className="text-accent">Cero esfuerzo.</span>
           </h2>
-          <p className="text-text-muted max-w-xl mx-auto">
+          <p className="text-text-muted max-w-xl mx-auto text-sm md:text-base">
             De la grabación a las notas organizadas en minutos.
           </p>
         </motion.div>
@@ -113,7 +113,7 @@ export function HowItWorks() {
                 }`}
               >
                 <div className={`flex-1 ${isEven ? "md:text-right" : "md:text-left"} hidden md:block`}>
-                  <div className={`inline-block p-6 rounded-2xl bg-surface/60 border border-border`}>
+                  <div className={`inline-block p-6 rounded-2xl bg-white border border-border shadow-[0_2px_12px_rgba(10,10,10,0.04)]`}>
                     <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
                     <p className="text-sm text-text-muted">{step.description}</p>
                   </div>
@@ -124,14 +124,14 @@ export function HowItWorks() {
                 </div>
 
                 <div className="flex-1 md:hidden">
-                  <div className="p-4 rounded-2xl bg-surface/60 border border-border">
+                  <div className="p-4 rounded-2xl bg-white border border-border shadow-[0_2px_12px_rgba(10,10,10,0.04)]">
                     <h3 className="font-semibold mb-1">{step.title}</h3>
                     <p className="text-sm text-text-muted">{step.description}</p>
                   </div>
                 </div>
 
                 <div className={`flex-1 ${isEven ? "md:text-left" : "md:text-right"} hidden md:block`}>
-                  <span className="text-5xl font-bold text-white/5">{String(step.step).padStart(2, "0")}</span>
+                  <span className="text-5xl font-bold text-foreground/5">{String(step.step).padStart(2, "0")}</span>
                 </div>
               </div>
             );

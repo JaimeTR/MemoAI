@@ -1,60 +1,18 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Play, Mic, Brain, FileText, FolderOpen, Timer, ShoppingCart, Truck, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronDown, Play, Truck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BuyButton } from "@/components/ui/BuyButton";
 import { Badge } from "@/components/ui/Badge";
 import { FloatingProduct } from "@/components/product/FloatingProduct";
+import { Logo } from "@/components/ui/Logo";
 import { PRODUCT } from "@/lib/constants";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const heroBenefits = [
-  { icon: FileText, text: "Nunca pierdas información" },
-  { icon: Brain, text: "No tomes apuntes manualmente" },
-  { icon: Mic, text: "Resúmenes automáticos con IA" },
-  { icon: FolderOpen, text: "Recuerda todos los acuerdos" },
-  { icon: Timer, text: "Ahorra horas cada semana" },
-  { icon: Check, text: "Todo en un solo lugar" },
-];
-
-const swapWords1 = ["transcribe", "resume", "organiza"];
-const swapWords2 = ["reuniones", "clases", "entrevistas"];
-
-// ── Swapping text with vertical slide ──
-function SwapText({ words, className }: { words: string[]; className?: string }) {
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % words.length), 2500);
-    return () => clearInterval(t);
-  }, [words.length]);
-
-  return (
-    <motion.span
-      className={`relative inline-flex overflow-hidden ${className || ""}`}
-      style={{ height: "1.1em", verticalAlign: "text-bottom" }}
-      animate={{ width: "auto" }}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-    >
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={words[idx]}
-          initial={{ y: 25, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -25, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="whitespace-nowrap leading-none"
-        >
-          {words[idx]}
-        </motion.span>
-      </AnimatePresence>
-    </motion.span>
-  );
-}
 
 interface HeroProps {
   onBuyClick: () => void;
@@ -66,8 +24,7 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const priceRef = useRef<HTMLDivElement>(null);
-  const benefitsRef = useRef<HTMLDivElement>(null);
+  const productRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -75,55 +32,8 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
 
       tl.from(titleRef.current, { y: 60, opacity: 0, duration: 1, delay: 0.3 })
         .from(subtitleRef.current, { y: 40, opacity: 0, duration: 0.8 }, "-=0.5")
-        .from(ctaRef.current, { y: 30, opacity: 0, duration: 0.6 }, "-=0.3")
-        .from(priceRef.current, { y: 30, opacity: 0, scale: 0.9, duration: 0.6 }, "-=0.3");
-
-      if (benefitsRef.current) {
-        const cards = Array.from(benefitsRef.current.children) as HTMLElement[];
-        const md = window.innerWidth >= 768;
-        if (md) {
-          // Desktop: 6 cards in circle around product
-          const positions = [
-            { left: "12%", top: "48%" },
-            { left: "26%", top: "12%" },
-            { left: "74%", top: "12%" },
-            { left: "88%", top: "48%" },
-            { left: "74%", top: "84%" },
-            { left: "26%", top: "84%" },
-          ];
-          cards.forEach((card, i) => {
-            if (positions[i]) {
-              card.style.position = "absolute";
-              card.style.left = positions[i].left;
-              card.style.top = positions[i].top;
-              card.style.transform = "translate(-50%, -50%)";
-              card.style.width = "230px";
-              card.style.zIndex = "20";
-            }
-          });
-        } else {
-          // Mobile: only 2 cards below the product
-          cards.forEach((card, i) => {
-            if (i < 2) {
-              card.style.position = "absolute";
-              card.style.left = i === 0 ? "8%" : "auto";
-              card.style.right = i === 0 ? "auto" : "8%";
-              card.style.top = "78%";
-              card.style.transform = "translateY(-50%)";
-              card.style.width = "42%";
-              card.style.maxWidth = "170px";
-              card.style.zIndex = "20";
-              card.style.display = "flex";
-            } else {
-              card.style.display = "none";
-            }
-          });
-        }
-
-        tl.fromTo(cards, { opacity: 0, y: 60, scale: 0.7 }, {
-          opacity: 1, y: 0, scale: 1, stagger: 0.12, duration: 0.6,
-        }, "-=0.4");
-      }
+        .from(ctaRef.current, { y: 30, opacity: 0, scale: 0.95, duration: 0.6 }, "-=0.3")
+        .from(productRef.current, { y: 30, opacity: 0, duration: 0.6 }, "-=0.3");
     });
 
     return () => ctx.revert();
@@ -132,129 +42,103 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-12 md:pt-20 pb-6 md:pb-10 overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16 md:pt-24 pb-8 overflow-hidden"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_60%)]" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-accent/5 rounded-full blur-[120px]" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]" />
+      {/* Soft light glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.06),transparent_55%)] pointer-events-none" />
+      {/* Faint waveform watermark — echoes the recording theme */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-64 md:h-80 opacity-[0.05] pointer-events-none [mask-image:linear-gradient(to_top,black,transparent)]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(90deg, var(--accent) 0px, var(--accent) 3px, transparent 3px, transparent 14px)",
+        }}
+      />
 
       <div className="relative z-10 max-w-6xl mx-auto w-full">
+        <div className="grid md:grid-cols-3 md:gap-10 lg:gap-14 items-center">
+          {/* Left column — copy + decision */}
+          <div className="md:col-span-2 flex flex-col items-center md:items-start text-center md:text-left">
+            {/* Logo */}
+            <motion.div
+              className="mb-6 md:mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Logo size="lg" />
+            </motion.div>
 
-        {/* ── MEMOAI name ── */}
-        <motion.div
-          className="text-center mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <span className="text-4xl md:text-5xl font-bold tracking-tight inline-flex items-center" style={{ fontFamily: '"Braze", sans-serif' }}>
-            <span className="text-foreground">MEMO</span>
-            <span className="gradient-text relative">
-              AI
-              <Sparkles className="absolute -top-2 -right-5 w-4 h-4 text-accent-light" />
-            </span>
-          </span>
-        </motion.div>
+            <h1
+              ref={titleRef}
+              className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-4 max-w-lg md:max-w-none leading-[1.1]"
+            >
+              Deja de tomar apuntes,
+              <br />
+              <span className="gradient-text">concéntrate en lo que realmente importa</span>
+            </h1>
 
-        {/* ── H1 Title ── */}
-        <h1
-          ref={titleRef}
-          className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold tracking-tight mb-5 text-center max-w-4xl mx-auto leading-tight"
-          style={{ fontFamily: '"Braze", sans-serif' }}
-        >
-          Deja de tomar apuntes y <span className="gradient-text">concéntrate en lo que realmente importa</span>
-        </h1>
+            <p
+              ref={subtitleRef}
+              className="hidden md:block text-base lg:text-lg text-text-muted max-w-none mb-5 leading-relaxed"
+            >
+              La grabadora inteligente con IA que{" "}
+              <span className="text-accent font-semibold text-lg lg:text-xl">transcribe, resume y organiza</span>
+              {" "}automáticamente tus{" "}
+              <span className="text-accent font-semibold text-lg lg:text-xl">reuniones, clases y entrevistas</span>.
+            </p>
 
-        {/* ── Subtitle with swapping words ── */}
-        <p
-          ref={subtitleRef}
-          className="hidden md:block text-sm sm:text-base md:text-lg lg:text-xl text-foreground/80 max-w-3xl mx-auto mb-4 text-center leading-relaxed px-2"
-        >
-          <span className="hidden md:inline">
-            La grabadora inteligente con IA que{" "}
-            <SwapText words={swapWords1} className="text-accent-light font-semibold" />
-            {" "}automáticamente tus{" "}
-            <SwapText words={swapWords2} className="text-accent-light font-semibold" />.
-          </span>
-        </p>
+            <div className="mb-5">
+              <Badge variant="success">
+                <motion.span
+                  className="inline-flex"
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Truck className="w-3.5 h-3.5" />
+                </motion.span>
+                {PRODUCT.shipping}
+              </Badge>
+            </div>
 
-        {/* ── ENVÍO GRATIS ── */}
-        <div className="flex justify-center mb-6">
-          <Badge variant="success">
-            <Truck className="w-3.5 h-3.5" />
-            {PRODUCT.shipping}
-          </Badge>
-        </div>
+            {/* Price + CTA — the decision, right up top */}
+            <div ref={ctaRef} className="flex flex-col items-center md:items-start gap-3 mb-6">
+              <div className="flex items-baseline gap-2 md:gap-3">
+                <span className="text-text-muted line-through text-sm md:text-lg">
+                  {PRODUCT.currency} {PRODUCT.originalPrice}
+                </span>
+                <span className="text-3xl md:text-5xl font-bold">
+                  {PRODUCT.currency} {PRODUCT.salePrice}
+                </span>
+                <span className="self-start text-[11px] md:text-sm font-bold px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-full bg-accent text-white">
+                  60% OFF
+                </span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center md:items-start justify-center gap-2 md:gap-3 mt-1 md:mt-2">
+                <BuyButton onClick={onBuyClick} size="md" className="text-sm md:text-base">
+                  COMPRAR AHORA
+                </BuyButton>
+                <Button variant="secondary" size="md" onClick={onVideoClick} className="text-sm md:text-base">
+                  <Play className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  VER PRODUCTO
+                </Button>
+              </div>
+            </div>
+          </div>
 
-        {/* ── PRODUCT + BENEFITS ── */}
-        <div className="relative flex justify-center mb-0" style={{ minHeight: "310px" }}>
-          <div className="relative z-10">
+          {/* Right column — product */}
+          <div ref={productRef} className="md:col-span-1 flex justify-center md:justify-end mt-8 md:mt-0">
             <FloatingProduct />
           </div>
-          <div ref={benefitsRef} className="absolute inset-0 pointer-events-none z-20">
-            {heroBenefits.map((item, i) => {
-              const Icon = item.icon;
-              return (
-              <div
-                key={i}
-                className="rounded-lg md:rounded-2xl p-1 md:p-3 backdrop-blur-2xl shadow-lg md:shadow-xl flex items-center gap-1 md:gap-3"
-                style={{
-                  background: "rgba(255, 255, 255, 0.04)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div className="w-6 h-6 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-3 h-3 md:w-5 md:h-5 text-emerald-400" />
-                </div>
-                <span className="text-[9px] md:text-sm font-medium text-foreground/80 md:text-foreground/90 leading-tight">{item.text}</span>
-              </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── CTA Buttons ── */}
-        <div ref={ctaRef} className="flex flex-col items-center justify-center gap-1.5 md:gap-3 mb-0 md:mb-2">
-          {/* Mobile: price with old price crossed + 60% OFF tag */}
-          <div className="flex md:hidden items-center justify-center gap-2 flex-wrap">
-            <span className="text-sm text-text-muted line-through">{PRODUCT.currency} {PRODUCT.originalPrice}</span>
-            <span className="text-xl font-bold">{PRODUCT.currency} {PRODUCT.salePrice}</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-accent text-white">60% OFF</span>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-3">
-            <Button size="md" onClick={onBuyClick} className="text-sm md:text-base">
-              <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              COMPRAR AHORA
-            </Button>
-            <Button variant="secondary" size="md" onClick={onVideoClick} className="text-sm md:text-base">
-              <Play className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              VER PRODUCTO
-            </Button>
-          </div>
-        </div>
-
-        {/* ── Price + Oferta ── */}
-        <div ref={priceRef} className="hidden md:flex flex-col items-center gap-2">
-          <div className="flex items-baseline gap-3">
-            <span className="text-text-muted line-through text-lg">
-              {PRODUCT.currency} {PRODUCT.originalPrice}
-            </span>
-            <span className="text-4xl md:text-5xl font-bold text-foreground">
-              {PRODUCT.currency} {PRODUCT.salePrice}
-            </span>
-          </div>
-          <Badge variant="accent">
-            Oferta por tiempo limitado — 60% OFF
-          </Badge>
         </div>
       </div>
 
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <ChevronDown className="w-6 h-6 text-text-muted" />
+        <ChevronDown className="w-5 h-5 text-text-muted" />
       </motion.div>
     </section>
   );

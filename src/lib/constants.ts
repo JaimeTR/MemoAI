@@ -7,6 +7,50 @@ export const PRODUCT = {
   shipping: "ENVÍO GRATIS A TODO EL PERÚ",
 } as const;
 
+import peruUbigeoData from "./peru-ubigeo.json";
+import shalomAgenciasData from "./shalom-agencias.json";
+
+// Full official ubigeo tree: departamento -> provincia -> distritos (24 departments + Lima Metropolitana + Callao).
+export const PERU_UBIGEO: Record<string, Record<string, string[]>> = peruUbigeoData;
+
+export const PERU_DEPARTMENTS = Object.keys(PERU_UBIGEO).sort((a, b) => a.localeCompare(b, "es"));
+
+// Lima Metropolitana districts, used by the Fast Lima delivery zone.
+export const LIMA_DISTRICTS = PERU_UBIGEO["Lima"]["Lima"];
+
+export interface ShalomAgency {
+  zona: string;
+  direccion: string;
+  telefono: string | null;
+  horario: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+// Real Shalom pickup-office directory (pulled from Shalom's own public agency-lookup API), keyed by
+// departamento -> provincia -> list of agencies, using the same department/province names as PERU_UBIGEO.
+export const SHALOM_AGENCIAS: Record<string, Record<string, ShalomAgency[]>> = shalomAgenciasData;
+
+export const DELIVERY_ZONES = [
+  {
+    id: "nacional" as const,
+    name: "Envío Nacional",
+    days: "2 a 3 días hábiles",
+    description: "Envío gratis vía Shalom",
+    shippingCost: 0,
+    fast: false,
+  },
+  {
+    id: "lima_fast" as const,
+    name: "Envío Express - Lima",
+    fullName: "Envío Express - Lima Metropolitana",
+    days: "1 día hábil",
+    description: "Envío con iDrive o Uber",
+    shippingCost: 10,
+    fast: true,
+  },
+];
+
 export const HERO_BENEFITS = [
   "Transcripción automática",
   "Resúmenes con IA",
@@ -71,37 +115,6 @@ export const USE_CASES = [
   { icon: "TrendingUp", title: "Equipos comerciales", description: "Llamadas, negociaciones y cierres" },
 ] as const;
 
-export const TESTIMONIALS = [
-  {
-    name: "María García",
-    role: "Abogada Corporativa",
-    text: "MemoAI transformó mi forma de trabajar. Ya no pierdo detalles en las reuniones con clientes. Las transcripciones son increíblemente precisas.",
-    result: "Ahorra 10 horas semanales",
-    avatar: "MG",
-  },
-  {
-    name: "Carlos Mendoza",
-    role: "Estudiante de Medicina",
-    text: "Mis apuntes ahora son perfectos. La IA resume las clases de 2 horas en puntos clave que puedo estudiar fácilmente.",
-    result: "Notas 90% más completas",
-    avatar: "CM",
-  },
-  {
-    name: "Ana Rodríguez",
-    role: "Consultora de Negocios",
-    text: "Después de cada reunión con clientes, MemoAI me entrega un resumen ejecutivo perfecto. Mis clientes quedan impresionados.",
-    result: "Productividad +200%",
-    avatar: "AR",
-  },
-  {
-    name: "Diego Torres",
-    role: "Periodista Freelance",
-    text: "Las entrevistas ahora se transcriben solas. Puedo enfocarme en hacer mejores preguntas sin preocuparme por tomar notas.",
-    result: "3x más entrevistas publicadas",
-    avatar: "DT",
-  },
-] as const;
-
 export const FAQS = [
   {
     question: "¿Cómo funciona?",
@@ -124,7 +137,11 @@ export const FAQS = [
     answer: "Puedes exportar en múltiples formatos: PDF, Word, TXT, Markdown y más. También se integra con Google Drive, Notion y otras herramientas de productividad.",
   },
   {
-    question: "¿Tiene garantía?",
-    answer: "Sí, MemoAI incluye 1 año de garantía contra defectos de fabricación. Además, ofrecemos soporte técnico prioritario y actualizaciones de software gratuitas.",
+    question: "¿Qué pasa si mi pedido llega dañado?",
+    answer: "Si tu pedido llega con daños durante el envío, contáctanos por WhatsApp dentro de las 24 horas posteriores a la entrega con fotos del producto y evaluaremos la solución caso por caso.",
+  },
+  {
+    question: "¿Puedo devolver mi MemoAI si cambio de opinión?",
+    answer: "No aceptamos devoluciones por cambio de opinión — revisa bien las especificaciones antes de comprar. Sí cubrimos defectos de fábrica o daños de transporte reportados dentro de las 48 horas de recibido. Ver política de compras completa.",
   },
 ] as const;

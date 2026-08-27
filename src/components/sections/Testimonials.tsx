@@ -4,124 +4,94 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
-import { TESTIMONIALS } from "@/lib/constants";
+import { Package, Cpu, Battery, Smartphone, Truck, ShieldCheck } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const included = [
+  { icon: Package, title: "Grabadora MemoAI", desc: "Dispositivo físico con audio HD" },
+  { icon: Cpu, title: "64GB de almacenamiento", desc: "Miles de horas de grabación" },
+  { icon: Battery, title: "Batería de larga duración", desc: "Jornadas completas sin recargar" },
+  { icon: Smartphone, title: "App móvil con IA", desc: "Transcripción y resúmenes automáticos" },
+  { icon: Truck, title: "Envío gratis", desc: "Lima 2 días, provincia 3 días aprox." },
+  { icon: ShieldCheck, title: "Compra protegida", desc: "Soporte por WhatsApp antes y después" },
+];
 
 export function Testimonials() {
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!gridRef.current) return;
-
     const ctx = gsap.context(() => {
-      const cards = Array.from(gridRef.current!.children);
-      
-      cards.forEach((card, i) => {
-        const angle = (i / cards.length) * Math.PI * 2;
-        const startX = Math.cos(angle) * 350;
-        const startY = Math.sin(angle) * 350;
-
+      if (gridRef.current) {
+        const cards = Array.from(gridRef.current.children);
         gsap.fromTo(
-          card,
+          cards,
+          { y: 60, opacity: 0, scale: 0.95 },
           {
-            x: startX,
-            y: startY,
-            opacity: 0,
-            scale: 0.5,
-            rotateY: -180,
-          },
-          {
-            x: 0,
             y: 0,
             opacity: 1,
             scale: 1,
-            rotateY: 0,
-            duration: 1.2,
-            delay: i * 0.15,
-            ease: "back.out(1.7)",
+            stagger: 0.1,
+            duration: 0.7,
+            ease: "power3.out",
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 70%",
+              trigger: gridRef.current,
+              start: "top 85%",
               toggleActions: "play none none reverse",
             },
           }
         );
-      });
-
-      gsap.from(".testimonials-title", {
-        y: 80,
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        },
-      });
+      }
     });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-32 px-4 bg-background/80 backdrop-blur-sm">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(99,102,241,0.06),transparent_60%)]" />
+    <section ref={sectionRef} className="relative py-20 md:py-32 px-4 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent pointer-events-none" />
 
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="testimonials-title text-center mb-16"
+          className="text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-sm font-mono text-accent uppercase tracking-widest mb-4 block">
-            Testimonios
+          <span className="text-xs md:text-sm font-mono text-accent uppercase tracking-[0.2em] mb-4 block">
+            Tu compra
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Lo que dicen nuestros <span className="gradient-text">usuarios</span>
+          <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
+            Qué incluye tu <span className="text-accent">MemoAI</span>
           </h2>
+          <p className="text-text-muted max-w-xl mx-auto text-sm md:text-base">
+            Todo lo que recibes en tu caja, sin letras pequeñas.
+          </p>
         </motion.div>
 
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {TESTIMONIALS.map((testimonial, i) => (
-            <motion.div
-              key={i}
-              className="relative p-8 rounded-2xl bg-surface/60 border border-border hover:border-accent/20 transition-all duration-500"
-              whileHover={{ y: -3 }}
-            >
-              <Quote className="w-8 h-8 text-accent/20 mb-4" />
-
-              <p className="text-foreground/90 mb-6 leading-relaxed">
-                &ldquo;{testimonial.text}&rdquo;
-              </p>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center text-sm font-bold">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-text-muted">{testimonial.role}</p>
-                  </div>
+        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {included.map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={i}
+                className="p-5 md:p-6 rounded-2xl bg-white border border-border shadow-[0_2px_16px_rgba(10,10,10,0.05)] hover:shadow-[0_8px_32px_rgba(99,102,241,0.12)] transition-all duration-500 text-center"
+                whileHover={{ y: -4 }}
+              >
+                <div className="w-11 h-11 md:w-12 md:h-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-3">
+                  <Icon className="w-5 h-5 md:w-6 md:h-6 text-accent-light" />
                 </div>
-
-                <div className="text-right">
-                  <div className="flex gap-0.5 mb-1">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <span className="text-xs text-emerald-400 font-medium">{testimonial.result}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                <h3 className="text-sm md:text-base font-semibold text-foreground mb-1">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-text-muted">
+                  {item.desc}
+                </p>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

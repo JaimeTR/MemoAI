@@ -115,48 +115,49 @@ export function Comparison() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-32 px-4 bg-background/80 backdrop-blur-sm">
+    <section ref={sectionRef} className="relative py-20 md:py-32 px-4 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent pointer-events-none" />
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="compare-title text-center mb-16"
+          className="compare-title text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-sm font-mono text-accent uppercase tracking-widest mb-4 block">
+          <span className="text-xs md:text-sm font-mono text-accent uppercase tracking-[0.2em] mb-4 block">
             Comparativa
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Método tradicional vs <span className="gradient-text">MemoAI</span>
+          <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
+            Método tradicional vs <span className="text-accent">MemoAI</span>
           </h2>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="compare-box p-8 rounded-2xl bg-red-500/5 border border-red-500/20">
-            <h3 className="text-xl font-bold text-red-400 mb-6 flex items-center gap-2">
+          <div className="compare-box p-8 rounded-2xl bg-white border border-border shadow-[0_2px_16px_rgba(10,10,10,0.05)]">
+            <h3 className="text-xl font-bold text-text-muted mb-6 flex items-center gap-2">
               <X className="w-5 h-5" />
               Método Tradicional
             </h3>
             <ul className="space-y-4">
               {traditional.map((item, i) => (
                 <li key={i} className="compare-traditional flex items-start gap-3 text-text-muted">
-                  <X className="w-4 h-4 text-red-400/60 mt-1 shrink-0" />
+                  <X className="w-4 h-4 text-text-muted/60 mt-1 shrink-0" />
                   <span className="text-sm">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="compare-box p-8 rounded-2xl bg-accent/5 border border-accent/20">
-            <h3 className="text-xl font-bold text-accent-light mb-6 flex items-center gap-2">
+          <div className="compare-box p-8 rounded-2xl bg-white border border-accent/25 shadow-[0_2px_16px_rgba(10,10,10,0.05)]">
+            <h3 className="text-xl font-bold text-accent mb-6 flex items-center gap-2">
               <Check className="w-5 h-5" />
               MemoAI
             </h3>
             <ul className="space-y-4">
               {memoai.map((item, i) => (
                 <li key={i} className="compare-memoai flex items-start gap-3">
-                  <Check className="w-4 h-4 text-emerald-400 mt-1 shrink-0" />
+                  <Check className="w-4 h-4 text-accent mt-1 shrink-0" />
                   <span className="text-sm">{item}</span>
                 </li>
               ))}

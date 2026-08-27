@@ -1,53 +1,16 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { FAQS } from "@/lib/constants";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".faq-item", {
-        y: 100,
-        opacity: 0,
-        scale: 0.8,
-        rotateX: -45,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 70%",
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      gsap.from(".faq-title", {
-        y: 80,
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        },
-      });
-    });
-
-    return () => ctx.revert();
-  }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-32 px-4 bg-background/80 backdrop-blur-sm">
+    <section className="relative py-20 md:py-32 px-4 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(99,102,241,0.06),transparent_60%)] pointer-events-none" />
       <div className="max-w-3xl mx-auto">
         <motion.div
           className="faq-title text-center mb-16"
@@ -59,8 +22,8 @@ export function FAQ() {
           <span className="text-sm font-mono text-accent uppercase tracking-widest mb-4 block">
             FAQ
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Preguntas <span className="gradient-text">frecuentes</span>
+          <h2 className="font-heading text-3xl md:text-5xl font-bold mb-4">
+            Preguntas <span className="text-accent">frecuentes</span>
           </h2>
         </motion.div>
 
@@ -75,7 +38,7 @@ export function FAQ() {
               transition={{ duration: 0.5, delay: i * 0.05 }}
             >
               <button
-                className="w-full flex items-center justify-between p-5 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-foreground/[0.03] transition-colors cursor-pointer"
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
               >
                 <span className="font-medium pr-4">{faq.question}</span>
