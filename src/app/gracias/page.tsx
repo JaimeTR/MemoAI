@@ -122,7 +122,7 @@ function GraciasContent() {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
-            href={`https://wa.me/${whatsappNumber}?text=Hola,%20acabo%20de%20comprar%20MemoAI.%20Quiero%20confirmar%20mi%20pedido.`}
+            href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderId ? `Hola, acabo de comprar MemoAI. Quiero confirmar mi pedido ${orderId}.` : "Hola, acabo de comprar MemoAI. Quiero confirmar mi pedido.")}`}
             target="_blank"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-semibold hover:opacity-90 transition-opacity"
           >

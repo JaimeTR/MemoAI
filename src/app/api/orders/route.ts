@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { syncOrderToErp } from "@/lib/erp";
+import { sendOrderConfirmationAfter } from "@/lib/email";
 import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 import { ensureCustomerAccount } from "@/lib/account";
 import { PRODUCT, DELIVERY_ZONES } from "@/lib/constants";
@@ -78,6 +79,7 @@ export async function POST(request: NextRequest) {
     });
 
     syncOrderToErp(order);
+    sendOrderConfirmationAfter(order);
 
     return NextResponse.json({ success: true, order }, { status: 201 });
   } catch (error) {
