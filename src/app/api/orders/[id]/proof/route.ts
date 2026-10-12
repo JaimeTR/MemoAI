@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
+import { syncOrderToErp } from "@/lib/erp";
 
 const BUCKET = "payment-proofs";
 
@@ -43,6 +44,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!updated) {
       return NextResponse.json({ error: "No se pudo guardar el comprobante" }, { status: 500 });
     }
+
+    syncOrderToErp(updated);
 
     return NextResponse.json({ url: data.publicUrl });
   } catch (error) {

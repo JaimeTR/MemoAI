@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { syncOrderToErp } from "@/lib/erp";
 
 export async function GET(
   request: NextRequest,
@@ -30,6 +31,8 @@ export async function PATCH(
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
+
+  syncOrderToErp(order);
 
   return NextResponse.json({ order });
 }

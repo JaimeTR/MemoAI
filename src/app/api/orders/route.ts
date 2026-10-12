@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { syncOrderToErp } from "@/lib/erp";
 import { ensureCustomerAccount } from "@/lib/account";
 import { PRODUCT, DELIVERY_ZONES } from "@/lib/constants";
 
@@ -60,6 +61,8 @@ export async function POST(request: NextRequest) {
       status: "pending",
       paymentProvider: body.paymentProvider || "culqi",
     });
+
+    syncOrderToErp(order);
 
     return NextResponse.json({ success: true, order }, { status: 201 });
   } catch (error) {
