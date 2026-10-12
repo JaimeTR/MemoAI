@@ -37,8 +37,8 @@ export function UseCases() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {USE_CASES.map((useCase, i) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {USE_CASES.slice(0, 4).map((useCase, i) => {
             const Icon = iconMap[useCase.icon];
             return (
               <motion.div

@@ -60,7 +60,7 @@ export function Footer() {
           <div className="flex items-center gap-4">
             <span className="text-xs text-text-muted">Métodos de pago:</span>
             <div className="flex gap-2">
-              {["Culqi", "Mercado Pago", "Izipay"].map((method) => (
+              {["Yape", "Plin", "Contraentrega"].map((method) => (
                 <span key={method} className="px-2 py-1 rounded text-[11px] bg-foreground/5 text-text-muted">
                   {method}
                 </span>

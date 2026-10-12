@@ -167,7 +167,7 @@ export function Offer({ onBuyClick }: OfferProps) {
             <div className="grid grid-cols-3 gap-4 mt-8">
               {[
                 { icon: Truck, label: "Envío gratis" },
-                { icon: ShieldCheck, label: "Pago 100% seguro" },
+                { icon: ShieldCheck, label: "Contraentrega disponible" },
                 { icon: MessageCircle, label: "Soporte por WhatsApp" },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center gap-2 text-center">
@@ -182,17 +182,17 @@ export function Offer({ onBuyClick }: OfferProps) {
             {/* Payment methods */}
             <div className="mt-8 pt-6 border-t border-border/50">
               <p className="text-[11px] md:text-xs text-text-muted mb-3 text-center uppercase tracking-wider">
-                Pagos 100% seguros
+                Formas de pago
               </p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
-                {["Yape", "Plin", "WhatsApp", "Visa", "Mastercard"].map((method) => (
+                {["Yape", "Plin", "WhatsApp", "Contraentrega"].map((method) => (
                   <span key={method} className="px-3 py-1.5 rounded-lg bg-foreground/5 text-foreground/70 text-xs font-bold">
                     {method}
                   </span>
                 ))}
               </div>
               <p className="text-[11px] text-text-muted/60 mt-3 text-center">
-                🔒 Tus datos están protegidos · Pago procesado por Culqi/Mercado Pago/Izipay
+                Coordinamos tu pago por WhatsApp y confirmamos tu pedido antes del envío
               </p>
             </div>
           </div>

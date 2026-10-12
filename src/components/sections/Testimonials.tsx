@@ -14,7 +14,7 @@ const included = [
   { icon: Battery, title: "Batería de larga duración", desc: "Jornadas completas sin recargar" },
   { icon: Smartphone, title: "App móvil con IA", desc: "Transcripción y resúmenes automáticos" },
   { icon: Truck, title: "Envío gratis", desc: "Lima 2 días, provincia 3 días aprox." },
-  { icon: ShieldCheck, title: "Compra protegida", desc: "Soporte por WhatsApp antes y después" },
+  { icon: ShieldCheck, title: "Paga al recibir", desc: "Contraentrega, Yape o Plin; soporte por WhatsApp" },
 ];
 
 export function Testimonials() {

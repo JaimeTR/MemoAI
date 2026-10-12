@@ -30,10 +30,10 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
-      tl.from(titleRef.current, { y: 60, opacity: 0, duration: 1, delay: 0.3 })
-        .from(subtitleRef.current, { y: 40, opacity: 0, duration: 0.8 }, "-=0.5")
-        .from(ctaRef.current, { y: 30, opacity: 0, scale: 0.95, duration: 0.6 }, "-=0.3")
-        .from(productRef.current, { y: 30, opacity: 0, duration: 0.6 }, "-=0.3");
+      tl.from(titleRef.current, { y: 24, duration: 0.6 })
+        .from(subtitleRef.current, { y: 16, duration: 0.5 }, "-=0.4")
+        .from(ctaRef.current, { y: 12, duration: 0.5 }, "-=0.3")
+        .from(productRef.current, { y: 12, duration: 0.5 }, "-=0.3");
     });
 
     return () => ctx.revert();
@@ -80,7 +80,7 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
 
             <p
               ref={subtitleRef}
-              className="hidden md:block text-base lg:text-lg text-text-muted max-w-none mb-5 leading-relaxed"
+              className="text-sm md:text-base lg:text-lg text-text-muted max-w-none mb-5 leading-relaxed"
             >
               La grabadora inteligente con IA que{" "}
               <span className="text-accent font-semibold text-lg lg:text-xl">transcribe, resume y organiza</span>
@@ -123,6 +123,7 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
                   VER PRODUCTO
                 </Button>
               </div>
+              <p className="text-sm text-text-muted">Precisión superior al 95% · 64GB · 20h de batería · Contraentrega disponible</p>
             </div>
           </div>
 

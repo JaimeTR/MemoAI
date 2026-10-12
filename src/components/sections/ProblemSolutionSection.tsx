@@ -7,13 +7,9 @@ import { motion } from "framer-motion";
 import {
   PenLine,
   Clock,
-  Brain,
-  Users,
   FileText,
   AlertTriangle,
   Mic,
-  Search,
-  FolderOpen,
   ShieldCheck,
 } from "lucide-react";
 
@@ -41,39 +37,6 @@ const items = [
     solutionIcon: FileText,
     stat: "Instantáneo",
     statLabel: "tu resumen queda listo",
-  },
-  {
-    tag: "DISTRACCIÓN",
-    problem: "Te distraes tomando apuntes en lugar de prestar atención",
-    problemIcon: Brain,
-    solution: "Concéntrate en lo importante, MemoAI anota por ti",
-    solutionDesc:
-      "Participa activamente en tus reuniones y clases. La IA se encarga de capturar, transcribir y organizar todo.",
-    solutionIcon: Brain,
-    stat: "Plena",
-    statLabel: "atención en la conversación",
-  },
-  {
-    tag: "CLIENTES",
-    problem: "No recuerdas exactamente qué dijo tu cliente o profesor",
-    problemIcon: Users,
-    solution: "Encuentra cualquier palabra dicha, al instante",
-    solutionDesc:
-      "Cada conversación queda transcrita y es 100% buscable. Encuentra el detalle exacto que necesitas en segundos.",
-    solutionIcon: Search,
-    stat: "Buscable",
-    statLabel: "cada palabra queda accesible",
-  },
-  {
-    tag: "DESORDEN",
-    problem: "Pasas horas organizando información sin estructura",
-    problemIcon: FileText,
-    solution: "Todo organizado y accesible al instante",
-    solutionDesc:
-      "Notas, transcripciones y resúmenes categorizados automáticamente. Encuentra cualquier información al momento.",
-    solutionIcon: FolderOpen,
-    stat: "Rápido",
-    statLabel: "encontrar lo que buscas",
   },
   {
     tag: "ESTRÉS",
