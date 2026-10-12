@@ -25,9 +25,11 @@ Mecanismo propio: grabar → transcribir con IA → resumir → organizar autom�
 
 - **Mercado:** Perú, venta online, precio promocional S/ 299 (precio anterior S/ 755).
 - **Envío:** gratis a todo el Perú. Lima Metropolitana: máximo 2 días (si el destino está en zona cercada, puede ser al instante vía Idrive u otro courier local). Provincia: aprox. 3 días. Vía Shalom u otra agencia a elección. Contraentrega disponible.
-- **Pagos:** Yape, Plin, WhatsApp (cerrar venta por chat con captura de pago). Link de pago con tarjeta (Culqi/Mercado Pago/Izipay) pendiente de cuenta del vendedor; campo configurable en el admin.
-- **Operación:** panel admin (/admin) para pedidos, clientes y configuración de números de pago. Contraseña actual: memoai2024 (cambiar en producción).
-- **Almacenamiento de datos:** en memoria (in-memory DB). En producción requiere base de datos persistente (PostgreSQL/Supabase).
+- **Tienda:** esta landing es la tienda de DevmarkPE Store (el vendedor es Devmark). No hay cuenta de pasarela de tarjeta y no se planea mostrar tarjeta por ahora.
+- **Pagos mostrados al cliente:** pago manual por Yape o Plin (captura de pago por WhatsApp) y contraentrega (confirmado como vigente por ahora). Sin pasarela: no mostrar Visa, Mastercard, Culqi, Mercado Pago ni Izipay (la opción de tarjeta del checkout depende de `paymentLinkEnabled` en ajustes, desactivada por defecto).
+- **Confirmación de pedido:** debe enviarse por correo y por WhatsApp.
+- **Operación:** panel admin (/admin) para pedidos, clientes y configuración de números de pago. Cada comprador tiene cuenta propia (magic link) para seguir sus pedidos. Los pedidos deben llegar al ERP Devmark del vendedor (proyecto local `ERP-Devmark`; el vendedor ofreció revisarlo y pasar el enlace): integración pendiente de definir. El acceso se valida en servidor con la variable `ADMIN_PASSWORD` (cookie httpOnly firmada); sin esa variable el panel queda cerrado.
+- **Almacenamiento de datos:** Supabase (esquema en `supabase/schema.sql`): pedidos, clientes, productos, cupones y ajustes. Cuentas de cliente con magic link.
 
 ## Capabilities and Constraints
 
@@ -35,8 +37,9 @@ Mecanismo propio: grabar → transcribir con IA → resumir → organizar autom�
 - Restricciones confirmadas:
   - **NO existe garantía de 1 año** (la landing la menciona y debe corregirse).
   - **NO hay devoluciones.** Se requieren políticas de compra, envío y privacidad claras para la venta online.
-  - El admin y los pedidos viven en memoria; se pierden al reiniciar.
-  - Pasarela de pago real aún no integrada (sin cuenta de Culqi).
+  - Sin pasarela de tarjeta: el cobro es manual por Yape o Plin.
+  - **No hay devoluciones** (confirmado por el vendedor). La política ante producto defectuoso o dañado en el envío está por definir: el FAQ dice 24 horas, la política de compras y los términos dicen 48 horas, y el vendedor indicó que no hay devolución. Antes de publicar, unificar el texto y validarlo legalmente (el Código de Protección al Consumidor de Perú suele exigir remedios ante defectos).
+  - Integración con el ERP Devmark: sin definir (enlace y modelo de datos pendientes).
 - Decidido pendiente: políticas legales exactas (términos, privacidad), número real de WhatsApp/Yape/Plin del vendedor (configurables en admin).
 
 ## Brand Commitments
@@ -47,7 +50,7 @@ Mecanismo propio: grabar → transcribir con IA → resumir → organizar autom�
 
 ## Evidence on Hand
 
-- Video demo real del producto: `public/video/memoai-demo.mp4`.
+- Video demo real del producto: `public/video/memoai-demo.mp4`. El vendedor también cuenta con fotos o video adicionales del producto (rutas por confirmar).
 - **Sin testimonios reales, sin fotos de clientes, sin prensa.** Los testimonios actuales de la landing son placeholders y deben reemplazarse por clientes reales antes de publicar; nunca inventar métricas de adopción.
 - Sin estudios propios que respalden estadísticas (67%, 40%, etc.); son cifras orientativas de copy, revisar antes de producción.
 

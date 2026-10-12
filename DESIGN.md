@@ -148,7 +148,7 @@ El sistema no usa sombras neutras clásicas. La profundidad se transmite con **g
 
 ## Shapes
 
-Radio generoso y consistente, sin esquinas rectas en ningún componente interactivo. Escala: `sm` 8px (badges de ícono pequeños), `md` 12px (inputs, bloques de resumen), `lg` 16px (cards), `xl` 24px (modal), `full` (botones, pills, badges, avatares de ícono). Sin bordes duros — donde hay borde, es `Hairline` de 1px casi invisible, nunca un borde de color sólido salvo en estados de selección (checkout).
+Radio generoso, sin esquinas rectas en ningún componente interactivo. Escala real en el código (por frecuencia): `xl` 12px (52 usos, inputs y bloques), `full` (49, botones y pills), `2xl` 16px (33, cards), `lg` 8px (30), `3xl` 24px (9, modales). Hay además dos valores sueltos (`rounded-[1.5rem]`, `rounded-[1.75rem]`) que deberían ser `3xl`. Antes se documentaba `sm`/`md`/`lg`/`xl` con otros píxeles; esta lista refleja el código. Pills y badges usan `full` (botones, pills, badges, avatares de ícono). Sin bordes duros — donde hay borde, es `Hairline` de 1px casi invisible, nunca un borde de color sólido salvo en estados de selección (checkout).
 
 ## Components
 
@@ -170,7 +170,7 @@ Radio generoso y consistente, sin esquinas rectas en ningún componente interact
 - **Selección (radio de método de pago):** el label completo cambia de borde y fondo (verde para Yape/Plin/WhatsApp, índigo para el link de tarjeta) — el estado seleccionado se ve en toda la tarjeta, no solo en el radio.
 
 ### Navigation
-- **Estilo:** pill flotante centrada, glass (blanco 80% + blur 20px), aparece solo después de 300px de scroll — no está presente en el Hero, se gana con la intención de navegar.
+- **Estilo:** pill flotante centrada, glass (blanco 80% + blur 20px), está presente desde el inicio a ancho de hero (máx. 1152px) y, tras 40px de scroll, se compacta a píldora flotante (máx. 768px, `top: 12px`).
 - **Estados:** links en Slate Muted → Ink Black al hover; el ítem "COMPRAR" siempre lleva fondo Signal Indigo + `animate-pulse-glow`, distinto de los demás links.
 - **Mobile:** menú fullscreen glass (blanco 97% + blur 30px), mismos estilos de link a tamaño `text-xl`.
 
@@ -187,6 +187,17 @@ Wordmark en dos partes: "MEMO" en Ink Black + "AI" con `gradient-text` (índigo 
 
 ### Don't:
 - **Don't** agregar una segunda sombra neutra fuera de `shadow-2xl` (reservada a modal/nav) — todo lo demás usa glow de color.
-- **Don't** usar `gradient-text` fuera del logo sin verificar que realmente sea el punto de máxima jerarquía de esa pantalla — hoy se usa en ~24 lugares del código y diluye la regla original de "el gradiente es del logo".
+- **Don't** usar `gradient-text` fuera del logo sin verificar que realmente sea el punto de máxima jerarquía de esa pantalla — hoy se usa en 12 lugares del código y diluye la regla original de "el gradiente es del logo".
 - **Don't** introducir un tercer acento cromático fuera de índigo/verde para uso general de UI.
 - **Don't** mezclar colores de marca de terceros (WhatsApp/Yape/Plin) fuera del selector de método de pago.
+
+## Deuda de diseño conocida
+
+Inconsistencias entre este documento y el código, a corregir (revisión de octubre 2026):
+
+- **Texto minúsculo:** 61 tamaños arbitrarios (`text-[11px]` 49 veces, más `10px`, `9px` y `8px`). Piso recomendado: `text-xs` (12px); solo logos o decoración pueden bajar de eso.
+- **Gradientes de fondo:** 27 usos (`bg-gradient`, `radial-gradient`, `linear-gradient`: glows del hero, línea de progreso, tarjetas). El sistema los acepta como parte del glow índigo, pero conviene limitarlos a ese rol.
+- **Radios sueltos:** `rounded-[1.5rem]` y `rounded-[1.75rem]` → usar `rounded-3xl`.
+- **Tres fuentes** (Sora, Space Grotesk, Braze): decisión vigente; Braze solo en el logo.
+- **Cobertura:** este archivo no documenta la sección "Tu compra", el selector de entrega nacional o Lima ni el mapa de dirección del checkout.
+- **Seguridad del admin (resuelto):** la contraseña ya no vive en el cliente; las rutas `/api` de pedidos, clientes, cupones, productos y ajustes (escritura) exigen la sesión de admin (`src/lib/admin-auth.ts`). Pendiente: `GET /api/orders/[id]` sigue público (la página de gracias lo usa) y devuelve datos personales del pedido; `POST /api/orders` no tiene límite de peticiones.
