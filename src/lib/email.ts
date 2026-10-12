@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import { createTransport } from "nodemailer";
 import { db, type Order } from "@/lib/db";
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -9,11 +10,10 @@ function payInstructions(order: Order, s: Awaited<ReturnType<typeof db.getSettin
   return "Te contactaremos por WhatsApp para coordinar el pago.";
 }
 
-/** Sends the order confirmation through Resend. Does nothing when RESEND_API_KEY or EMAIL_FROM are missing. */
+/** Sends the order confirmation over SMTP (same SMTP_* variables as the ERP, but the store mailbox). Does nothing when they are missing. */
 export async function sendOrderConfirmation(order: Order) {
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-  if (!key || !from) return;
+  const { SMTP_HOST: host, SMTP_PORT: port, SMTP_USER: user, SMTP_PASS: pass, SMTP_FROM: from } = process.env;
+  if (!host || !port || !user || !pass || !from) return;
 
   try {
     const settings = await db.getSettings();
@@ -31,13 +31,13 @@ export async function sendOrderConfirmation(order: Order) {
 <p style="color:#5f6672;font-size:13px">Envío a ${esc(order.city)}, ${esc(order.department)}. Si no hiciste este pedido, ignora este correo.</p>
 </div>`;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: order.customerEmail, subject: "Recibimos tu pedido de MemoAI", html }),
-      signal: AbortSignal.timeout(10_000),
+    await createTransport({ host, port: Number(port), secure: Number(port) === 465, auth: { user, pass } }).sendMail({
+      from,
+      to: order.customerEmail,
+      subject: "Recibimos tu pedido de MemoAI",
+      html,
+      headers: { "Content-Language": "es" },
     });
-    if (!res.ok) console.error(`Correo de confirmación falló para ${order.id}: ${res.status} ${await res.text()}`);
   } catch (error) {
     console.error(`Correo de confirmación falló para ${order.id}:`, error);
   }
