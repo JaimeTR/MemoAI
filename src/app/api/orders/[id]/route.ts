@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/admin-auth";
+import { isAdmin, requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { syncOrderToErp } from "@/lib/erp";
@@ -12,6 +12,12 @@ export async function GET(
 
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  // The id works as a receipt link, so the public view omits phone, DNI and street address.
+  if (!(await isAdmin())) {
+    const { id: orderId, status, product, quantity, amount, city, department, createdAt, customerEmail } = order;
+    return NextResponse.json({ order: { id: orderId, status, product, quantity, amount, city, department, createdAt, customerEmail } });
   }
 
   return NextResponse.json({ order });

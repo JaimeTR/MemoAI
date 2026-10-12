@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, "coupon", 30, 10 * 60_000)) return tooManyRequests();
   const body = await request.json();
   const code = (body.code || "").trim();
   const amount = typeof body.amount === "number" ? body.amount : 0;

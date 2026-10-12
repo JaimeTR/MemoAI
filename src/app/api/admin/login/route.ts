@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 import { ADMIN_COOKIE, checkPassword, sessionToken } from "@/lib/admin-auth";
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, "admin-login", 8, 15 * 60_000)) return tooManyRequests();
   if (!process.env.ADMIN_PASSWORD) {
     return NextResponse.json({ error: "ADMIN_PASSWORD no está configurada" }, { status: 503 });
   }

@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { syncOrderToErp } from "@/lib/erp";
+import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 
 const BUCKET = "payment-proofs";
+const MAX_BYTES = 5 * 1024 * 1024;
+const TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic", "image/heif": "heif", "application/pdf": "pdf" };
 
 async function ensureBucket() {
   const { data: buckets } = await supabaseAdmin.storage.listBuckets();
@@ -12,12 +15,18 @@ async function ensureBucket() {
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (isRateLimited(request, "proof", 10, 10 * 60_000)) return tooManyRequests();
   const { id } = await params;
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     if (!file) {
       return NextResponse.json({ error: "No se recibió ningún archivo" }, { status: 400 });
+    }
+
+    const ext = TYPES[file.type];
+    if (!ext || file.size > MAX_BYTES) {
+      return NextResponse.json({ error: "Sube una imagen (JPG, PNG, WebP) o PDF de hasta 5 MB" }, { status: 400 });
     }
 
     const order = await db.getOrder(id);
@@ -27,7 +36,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     await ensureBucket();
 
-    const ext = file.name.split(".").pop() || "jpg";
     const path = `${id}-${Date.now()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
