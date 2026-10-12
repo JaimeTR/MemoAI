@@ -1,5 +1,7 @@
 ﻿"use client";
 
+
+import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, MessageCircle, Package, Truck, ShieldCheck, Mail, Loader2 } from "lucide-react";
@@ -10,15 +12,10 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 function GraciasContent() {
   const searchParams = useSearchParams();
-  const [orderId, setOrderId] = useState("");
+  const orderId = searchParams.get("order") ?? "";
   const [settings, setSettings] = useState<ShopSettings | null>(null);
   const [customerEmail, setCustomerEmail] = useState("");
   const [magicLinkState, setMagicLinkState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-
-  useEffect(() => {
-    const id = searchParams.get("order");
-    if (id) setOrderId(id);
-  }, [searchParams]);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -164,9 +161,9 @@ function GraciasContent() {
         )}
 
         <div className="mt-8">
-          <a href="/" className="text-sm text-text-muted hover:text-foreground transition-colors">
+          <Link href="/" className="text-sm text-text-muted hover:text-foreground transition-colors">
             ← Volver al inicio
-          </a>
+          </Link>
         </div>
       </motion.div>
     </main>

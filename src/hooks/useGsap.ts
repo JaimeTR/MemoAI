@@ -27,7 +27,8 @@ export function useGsapScrollTrigger(
     }, triggerRef);
 
     return () => ctx.revert();
-  }, deps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps); // caller-supplied deps
 
   return triggerRef;
 }

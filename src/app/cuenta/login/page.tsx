@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Loader2, ArrowLeft } from "lucide-react";
@@ -76,10 +77,10 @@ export default function LoginPage() {
         </motion.div>
 
         <div className="mt-6 text-center">
-          <a href="/" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-foreground transition-colors">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-foreground transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
             Volver a la tienda
-          </a>
+          </Link>
         </div>
       </div>
     </main>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, use } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Truck, PackageX } from "lucide-react";
@@ -56,9 +57,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     <div className="noise-bg min-h-screen">
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/">
+          <Link href="/">
             <Logo size="sm" />
-          </a>
+          </Link>
         </div>
       </header>
 

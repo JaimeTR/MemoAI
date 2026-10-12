@@ -162,7 +162,6 @@ export function AddressMapPicker({ isOpen, onClose, onSelect }: AddressMapPicker
       } catch {}
     }, 500);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const handleLocate = () => {

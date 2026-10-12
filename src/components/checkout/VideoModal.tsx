@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Pause } from "lucide-react";
+import { X, Play } from "lucide-react";
 import { useRef, useState } from "react";
 
 interface VideoModalProps {

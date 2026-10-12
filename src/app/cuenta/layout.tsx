@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Package, User, CreditCard, LogOut, LayoutGrid } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
@@ -29,9 +30,9 @@ export default function CuentaLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen">
       <header className="border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/">
+          <Link href="/">
             <Logo size="sm" />
-          </a>
+          </Link>
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 text-xs font-medium text-text-muted hover:text-foreground transition-colors cursor-pointer"

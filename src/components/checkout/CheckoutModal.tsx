@@ -129,7 +129,9 @@ export function CheckoutModal({ isOpen, onClose, product = PRODUCT }: CheckoutMo
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (prevOpen !== isOpen) {
+    setPrevOpen(isOpen);
     if (!isOpen) {
       setStep("summary");
       setCopied(false);
@@ -141,8 +143,7 @@ export function CheckoutModal({ isOpen, onClose, product = PRODUCT }: CheckoutMo
       setProofError("");
       removeCoupon();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (e.target.name === "address") setAddressCoords(null);
