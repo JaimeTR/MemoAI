@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
@@ -5,6 +6,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const { code } = await params;
   const body = await request.json();
 
@@ -21,6 +24,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const { code } = await params;
   const deleted = await db.deleteCoupon(code);
 

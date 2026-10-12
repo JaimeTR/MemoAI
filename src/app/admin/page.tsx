@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Package, Users, DollarSign, Clock, ArrowLeft, RefreshCw, Settings, Save, Tag, Plus, Trash2, MapPin, Box, Pencil, X, Upload } from "lucide-react";
@@ -44,17 +45,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
-  const ADMIN_PASSWORD = "memoai2024";
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    if (res.ok) {
       setAuthenticated(true);
       fetchData();
       fetchSettings();
     } else {
-      alert("Contraseña incorrecta");
+      setLoginError(res.status === 503 ? "Falta configurar ADMIN_PASSWORD en el servidor." : "Contraseña incorrecta.");
     }
   };
 
@@ -259,10 +264,16 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (authenticated) {
-      fetchData();
-    }
-  }, [authenticated]);
+    fetch("/api/admin/session")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.ok) return;
+        setAuthenticated(true);
+        fetchData();
+        fetchSettings();
+      })
+      .catch(() => {});
+  }, []);
 
   if (!authenticated) {
     return (
@@ -285,6 +296,7 @@ export default function AdminPage() {
               className="w-full px-4 py-3 rounded-xl bg-surface-light/60 border border-border text-foreground placeholder-text-muted/50 focus:outline-none focus:border-accent/50"
               required
             />
+            {loginError && <p role="alert" className="text-sm text-red-600">{loginError}</p>}
             <button
               type="submit"
               className="w-full py-3 rounded-xl bg-accent hover:bg-accent-light text-white font-medium transition-colors cursor-pointer"
@@ -310,10 +322,10 @@ export default function AdminPage() {
       <header className="border-b border-border bg-surface/50 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/" className="flex items-center gap-2 text-text-muted hover:text-foreground transition-colors">
+            <Link href="/" className="flex items-center gap-2 text-text-muted hover:text-foreground transition-colors">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Volver al sitio</span>
-            </a>
+            </Link>
             <div className="w-px h-6 bg-border" />
             <h1 className="text-xl font-bold">
               <span className="text-accent">MEMOAI</span> Admin

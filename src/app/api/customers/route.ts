@@ -1,8 +1,11 @@
+import { requireAdmin } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Customer } from "@/lib/db";
 
 export async function GET() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   const { data: profiles, error } = await supabaseAdmin
     .from("profiles")
     .select("id, name, email, phone, created_at")
