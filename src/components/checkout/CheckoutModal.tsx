@@ -8,7 +8,8 @@ import { Select } from "@/components/ui/Select";
 import { WipeButtonContent } from "@/components/ui/WipeButtonContent";
 import { AddressMapPicker } from "@/components/checkout/AddressMapPicker";
 import { PRODUCT, LIMA_DISTRICTS, PERU_DEPARTMENTS, PERU_UBIGEO, SHALOM_AGENCIAS, DELIVERY_ZONES } from "@/lib/constants";
-import type { ShopSettings, Coupon } from "@/lib/db";
+import type { ShopSettings } from "@/lib/db";
+import type { CuponAplicado } from "@/lib/cupones";
 import { cn } from "@/lib/utils";
 
 export interface CheckoutProduct {
@@ -62,7 +63,7 @@ export function CheckoutModal({ isOpen, onClose, product = PRODUCT }: CheckoutMo
   const [orderId, setOrderId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [couponInput, setCouponInput] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<CuponAplicado | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponError, setCouponError] = useState("");
   const [checkingCoupon, setCheckingCoupon] = useState(false);

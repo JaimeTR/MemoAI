@@ -1,4 +1,3 @@
-import { requireAdmin } from "@/lib/admin-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { syncOrderToErp } from "@/lib/erp";
@@ -7,13 +6,7 @@ import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 import { ensureCustomerAccount } from "@/lib/account";
 import { DELIVERY_ZONES } from "@/lib/constants";
 import { productoParaPedido } from "@/lib/catalogo";
-
-export async function GET() {
-  const denied = await requireAdmin();
-  if (denied) return denied;
-  const orders = await db.getOrders();
-  return NextResponse.json({ orders });
-}
+import { validarCupon } from "@/lib/cupones";
 
 export async function POST(request: NextRequest) {
   if (isRateLimited(request, "order", 10, 10 * 60_000)) return tooManyRequests();
@@ -46,15 +39,13 @@ export async function POST(request: NextRequest) {
     const productName = producto.nombre;
     let amount = unitPrice * quantity;
 
+    // El cupon tambien se valida aqui (no se confia en el descuento que muestre el navegador).
     let couponCode: string | undefined;
-    if (body.couponCode) {
-      const coupon = await db.getCoupon(body.couponCode);
-      if (coupon && coupon.active) {
-        const discount =
-          coupon.type === "percent" ? Math.round((amount * coupon.value) / 100) : Math.min(coupon.value, amount);
-        amount = Math.max(0, amount - discount);
-        couponCode = coupon.code;
-      }
+    if (typeof body.couponCode === "string" && body.couponCode.trim()) {
+      const r = await validarCupon(body.couponCode, amount);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: 409 });
+      amount = Math.max(0, Math.round((amount - r.cupon.discount) * 100) / 100);
+      couponCode = r.cupon.code;
     }
 
     const zone = DELIVERY_ZONES.find((z) => z.id === body.deliveryZone) || DELIVERY_ZONES[0];

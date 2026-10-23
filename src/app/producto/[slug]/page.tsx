@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { listarProductos, productoPorSlug, simboloDe } from "@/lib/catalogo";
-import { db } from "@/lib/db";
+import { obtenerAjustes } from "@/lib/ajustes";
 import { LandingMemoAI } from "@/components/memoai/LandingMemoAI";
 import { ProductoLanding } from "@/components/store/ProductoLanding";
 import { StoreHeader } from "@/components/store/StoreHeader";
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PaginaProducto({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [producto, ajustes] = await Promise.all([productoPorSlug(slug), db.getSettings()]);
+  const [producto, ajustes] = await Promise.all([productoPorSlug(slug), obtenerAjustes()]);
   if (!producto) notFound();
 
   // Datos estructurados para Google: producto, precio y disponibilidad.

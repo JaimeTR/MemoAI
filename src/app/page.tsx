@@ -1,5 +1,5 @@
 import { listarProductos } from "@/lib/catalogo";
-import { db } from "@/lib/db";
+import { obtenerAjustes } from "@/lib/ajustes";
 import { StoreHeader } from "@/components/store/StoreHeader";
 import { StoreFooter } from "@/components/store/StoreFooter";
 import { StoreHome } from "@/components/store/StoreHome";
@@ -8,7 +8,7 @@ import { StoreHome } from "@/components/store/StoreHome";
 export const revalidate = 300;
 
 export default async function Inicio() {
-  const [productos, ajustes] = await Promise.all([listarProductos(), db.getSettings()]);
+  const [productos, ajustes] = await Promise.all([listarProductos(), obtenerAjustes()]);
   return (
     <div className="store">
       <StoreHeader whatsapp={ajustes.whatsappNumber} />
