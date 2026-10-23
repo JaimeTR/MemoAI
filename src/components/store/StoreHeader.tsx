@@ -15,16 +15,21 @@ const NAV = [
   { href: "/#preguntas", label: "Preguntas" },
 ];
 
-/** Logo de la tienda: el simbolo de DEVMARK, el nombre en Braze y STORE en pequeno. */
-export function StoreLogo({ claro }: { claro?: boolean }) {
+/**
+ * Logotipo de DevmarkPE Store (bolsa + DEVMARK + STORE). `claro` = va sobre fondo oscuro.
+ * `completo` agrega el lema "Tecnologia con IA" (pie de pagina); la barra usa la version sin lema.
+ */
+export function StoreLogo({ claro, completo }: { claro?: boolean; completo?: boolean }) {
+  const archivo = `/marca/devmarkstore-logotipo${completo ? "" : "-sin-lema"}${claro ? "-fondo-oscuro" : ""}.svg`;
   return (
-    <span className="flex items-center gap-2.5">
-      <Image src={claro ? "/logo-mark-white.svg" : "/logo-mark.svg"} alt="" width={32} height={32} className="h-8 w-8" priority />
-      <span className="flex items-baseline gap-1.5">
-        <span className="font-braze text-lg tracking-wider sm:text-xl">DEVMARK</span>
-        <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.18em]", claro ? "bg-white/10 text-periwinkle" : "bg-mist text-indigo")}>STORE</span>
-      </span>
-    </span>
+    <Image
+      src={archivo}
+      alt="DevmarkPE Store"
+      width={completo ? 300 : 207}
+      height={completo ? 58 : 40}
+      className={completo ? "h-[58px] w-auto" : "h-9 w-auto sm:h-10"}
+      priority={!completo}
+    />
   );
 }
 

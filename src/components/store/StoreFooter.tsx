@@ -14,7 +14,7 @@ export function StoreFooter() {
     <footer className="s-panel mb-2 mt-2 bg-ink text-white sm:mb-3 sm:mt-3">
       <div className="s-inner grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <StoreLogo claro />
+          <StoreLogo claro completo />
           <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed text-ink-muted">
             Tecnología con inteligencia artificial, elegida por DEVMARK. Envío gratis a todo el Perú.
           </p>
