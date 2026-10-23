@@ -37,7 +37,7 @@ export async function sendOrderToErp(order: Order) {
     pedidoEn: order.createdAt,
     items: [
       {
-        productoExternoId: order.productId || undefined,
+        productoExternoId: order.productRef || order.productId || undefined,
         descripcion: order.product,
         cantidad: order.quantity,
         // El pedido no guarda el precio unitario; el total manda.

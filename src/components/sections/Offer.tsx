@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Truck, ShieldCheck, MessageCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { PRODUCT } from "@/lib/constants";
+import { usePrecio } from "@/components/memoai/precio";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,8 +68,9 @@ interface OfferProps {
 }
 
 export function Offer({ onBuyClick }: OfferProps) {
+  const precio = usePrecio();
   const sectionRef = useRef<HTMLElement>(null);
-  const discount = Math.round((1 - PRODUCT.salePrice / PRODUCT.originalPrice) * 100);
+  const discount = Math.round((1 - precio.salePrice / precio.originalPrice) * 100);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -148,10 +149,10 @@ export function Offer({ onBuyClick }: OfferProps) {
           <div className="offer-card p-8 rounded-3xl glass mb-8">
             <div className="flex items-baseline justify-center gap-3 mb-2">
               <span className="text-text-muted line-through text-xl">
-                {PRODUCT.currency} {PRODUCT.originalPrice}
+                {precio.currency} {precio.originalPrice}
               </span>
               <span className="text-5xl md:text-6xl font-bold gradient-text">
-                {PRODUCT.currency} {PRODUCT.salePrice}
+                {precio.currency} {precio.salePrice}
               </span>
             </div>
             <p className="text-text-muted text-sm mb-6">Pago único — Sin suscripciones</p>

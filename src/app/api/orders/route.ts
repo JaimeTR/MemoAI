@@ -5,7 +5,8 @@ import { syncOrderToErp } from "@/lib/erp";
 import { sendOrderConfirmationAfter } from "@/lib/email";
 import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 import { ensureCustomerAccount } from "@/lib/account";
-import { PRODUCT, DELIVERY_ZONES } from "@/lib/constants";
+import { DELIVERY_ZONES } from "@/lib/constants";
+import { productoParaPedido } from "@/lib/catalogo";
 
 export async function GET() {
   const denied = await requireAdmin();
@@ -34,10 +35,15 @@ export async function POST(request: NextRequest) {
 
     const quantity = Math.max(1, Math.min(5, Number(body.quantity) || 1));
 
-    // Never trust a client-sent price — look up the real product server-side when one is given.
-    const catalogProduct = body.productId ? await db.getProduct(body.productId) : null;
-    const unitPrice = catalogProduct ? catalogProduct.salePrice : PRODUCT.salePrice;
-    const productName = catalogProduct ? catalogProduct.name : "MemoAI - Grabadora Inteligente";
+    // El precio nunca sale del navegador: se busca el producto en el catalogo (ERP o respaldo).
+    const producto = await productoParaPedido(typeof body.productId === "string" ? body.productId : null);
+    if (!producto) return NextResponse.json({ error: "Ese producto ya no está disponible" }, { status: 404 });
+    if (producto.disponibilidad === "agotado") return NextResponse.json({ error: "Este producto está agotado" }, { status: 409 });
+    if (producto.unidades !== null && quantity > producto.unidades) {
+      return NextResponse.json({ error: `Solo quedan ${producto.unidades} unidades` }, { status: 409 });
+    }
+    const unitPrice = producto.precio;
+    const productName = producto.nombre;
     let amount = unitPrice * quantity;
 
     let couponCode: string | undefined;
@@ -69,7 +75,9 @@ export async function POST(request: NextRequest) {
       city: body.city,
       province: body.province || undefined,
       department: body.department,
-      productId: catalogProduct?.id ?? null,
+      // product_id apunta a la tabla products de Supabase: solo se llena si el producto es de ahi.
+      productId: producto.fuente === "tienda" && producto.id ? producto.id : null,
+      productRef: producto.id || null,
       product: productName,
       quantity,
       couponCode,

@@ -1,136 +1,71 @@
-"use client";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { listarProductos, productoPorSlug, simboloDe } from "@/lib/catalogo";
+import { db } from "@/lib/db";
+import { LandingMemoAI } from "@/components/memoai/LandingMemoAI";
+import { ProductoLanding } from "@/components/store/ProductoLanding";
+import { StoreHeader } from "@/components/store/StoreHeader";
+import { StoreFooter } from "@/components/store/StoreFooter";
 
-import Link from "next/link";
-import { useEffect, useState, use } from "react";
-import { motion } from "framer-motion";
-import { ShieldCheck, Truck, PackageX } from "lucide-react";
-import { Logo } from "@/components/ui/Logo";
-import { Button } from "@/components/ui/Button";
-import { BuyButton } from "@/components/ui/BuyButton";
-import { CheckoutModal } from "@/components/checkout/CheckoutModal";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
-import type { Product } from "@/lib/db";
+export const revalidate = 300;
 
-export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+export async function generateStaticParams() {
+  return (await listarProductos()).map((p) => ({ slug: p.slug }));
+}
 
-  useEffect(() => {
-    fetch("/api/products")
-      .then((r) => r.json())
-      .then((d) => {
-        const found = (d.products as Product[])?.find((p) => p.slug === slug && p.active);
-        if (found) setProduct(found);
-        else setNotFound(true);
-      })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
-  }, [slug]);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const p = await productoPorSlug(slug);
+  if (!p) return { title: "Producto no encontrado" };
+  const descripcion = p.tagline ?? p.descripcion?.slice(0, 160) ?? `${p.nombre} con envío gratis a todo el Perú.`;
+  return {
+    title: p.nombre,
+    description: descripcion,
+    alternates: { canonical: `/producto/${p.slug}` },
+    openGraph: { title: p.nombre, description: descripcion, images: p.imagenes[0] ? [{ url: p.imagenes[0].url, alt: p.imagenes[0].alt }] : undefined },
+  };
+}
 
-  if (loading) {
+export default async function PaginaProducto({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const [producto, ajustes] = await Promise.all([productoPorSlug(slug), db.getSettings()]);
+  if (!producto) notFound();
+
+  // Datos estructurados para Google: producto, precio y disponibilidad.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: producto.nombre,
+    description: producto.tagline ?? producto.descripcion ?? undefined,
+    image: producto.imagenes.map((i) => i.url),
+    brand: { "@type": "Brand", name: "DevmarkPE Store" },
+    offers: {
+      "@type": "Offer",
+      price: producto.precio.toFixed(2),
+      priceCurrency: producto.moneda,
+      availability: producto.disponibilidad === "agotado" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      url: `${process.env.SITE_URL ?? "https://devmarkpe.store"}/producto/${producto.slug}`,
+    },
+  };
+  const ld = <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />;
+
+  if (producto.landing === "memoai") {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted">Cargando…</p>
-      </main>
+      <>
+        {ld}
+        <LandingMemoAI
+          producto={{ id: producto.id || undefined, name: producto.nombre, salePrice: producto.precio, originalPrice: producto.precioAnterior ?? producto.precio, currency: simboloDe(producto.moneda) }}
+        />
+      </>
     );
   }
-
-  if (notFound || !product) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
-        <PackageX className="w-10 h-10 text-text-muted/40 mb-4" />
-        <h1 className="font-heading text-xl font-semibold mb-2">Producto no encontrado</h1>
-        <p className="text-sm text-text-muted mb-6">Este producto no existe o ya no está disponible.</p>
-        <Button onClick={() => (window.location.href = "/")}>Volver al inicio</Button>
-      </main>
-    );
-  }
-
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.salePrice) / product.originalPrice) * 100)
-    : 0;
 
   return (
-    <div className="noise-bg min-h-screen">
-      <header className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
-            <Logo size="sm" />
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-4 py-12 md:py-20">
-        <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="aspect-square rounded-3xl bg-surface-light/60 border border-border overflow-hidden flex items-center justify-center"
-          >
-            {product.images[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <PackageX className="w-16 h-16 text-text-muted/30" />
-            )}
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-            <h1 className="font-heading text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
-            {product.tagline && <p className="text-lg text-text-muted mb-4">{product.tagline}</p>}
-
-            <div className="flex items-center gap-3 mb-6">
-              {product.originalPrice && product.originalPrice > product.salePrice && (
-                <span className="text-lg text-text-muted line-through">
-                  {product.currency} {product.originalPrice}
-                </span>
-              )}
-              <span className="text-3xl font-bold gradient-text">
-                {product.currency} {product.salePrice}
-              </span>
-              {discount > 0 && (
-                <span className="text-xs font-bold px-2 py-1 rounded-full bg-accent text-white">{discount}% OFF</span>
-              )}
-            </div>
-
-            {product.description && (
-              <p className="text-sm text-text-muted leading-relaxed mb-8 whitespace-pre-line">{product.description}</p>
-            )}
-
-            <BuyButton onClick={() => setCheckoutOpen(true)} size="lg" className="w-full sm:w-auto mb-6">
-              COMPRAR AHORA
-            </BuyButton>
-
-            <div className="flex items-center gap-4 text-xs text-text-muted">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                Pago seguro
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-accent" />
-                Envío a todo el Perú
-              </span>
-            </div>
-          </motion.div>
-        </div>
-      </main>
-
-      <CheckoutModal
-        isOpen={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        product={{
-          id: product.id,
-          name: product.name,
-          salePrice: product.salePrice,
-          originalPrice: product.originalPrice || product.salePrice,
-          currency: product.currency,
-        }}
-      />
-      <WhatsAppButton />
+    <div className="store">
+      {ld}
+      <StoreHeader whatsapp={ajustes.whatsappNumber} claro />
+      <ProductoLanding producto={producto} whatsapp={ajustes.whatsappNumber} />
+      <StoreFooter />
     </div>
   );
 }

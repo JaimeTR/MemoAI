@@ -13,6 +13,8 @@ export interface Order {
   province?: string;
   department: string;
   productId?: string | null;
+  /** Id del producto en el catalogo (ERP o Supabase); es el que se le manda al ERP. */
+  productRef?: string | null;
   product: string;
   quantity: number;
   couponCode?: string;
@@ -92,6 +94,7 @@ function rowToOrder(row: any): Order {
     province: row.province ?? undefined,
     department: row.department,
     productId: row.product_id,
+    productRef: row.product_ref ?? row.product_id ?? null,
     product: row.product,
     quantity: row.quantity,
     couponCode: row.coupon_code ?? undefined,
@@ -173,31 +176,35 @@ class Database {
 
   async addOrder(order: Omit<Order, "id" | "createdAt">): Promise<Order> {
     const id = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const { data, error } = await supabaseAdmin
-      .from("orders")
-      .insert({
-        id,
-        customer_id: order.customerId ?? null,
-        customer_name: order.customerName,
-        customer_email: order.customerEmail,
-        customer_phone: order.customerPhone,
-        address: order.address,
-        dni: order.dni ?? null,
-        maps_link: order.mapsLink ?? null,
-        city: order.city,
-        province: order.province ?? null,
-        department: order.department,
-        product_id: order.productId ?? null,
-        product: order.product,
-        quantity: order.quantity,
-        coupon_code: order.couponCode ?? null,
-        amount: order.amount,
-        status: order.status,
-        payment_provider: order.paymentProvider,
-        payment_proof_url: order.paymentProofUrl ?? null,
-      })
-      .select()
-      .single();
+    const fila = {
+      id,
+      customer_id: order.customerId ?? null,
+      customer_name: order.customerName,
+      customer_email: order.customerEmail,
+      customer_phone: order.customerPhone,
+      address: order.address,
+      dni: order.dni ?? null,
+      maps_link: order.mapsLink ?? null,
+      city: order.city,
+      province: order.province ?? null,
+      department: order.department,
+      product_id: order.productId ?? null,
+      product_ref: order.productRef ?? null,
+      product: order.product,
+      quantity: order.quantity,
+      coupon_code: order.couponCode ?? null,
+      amount: order.amount,
+      status: order.status,
+      payment_provider: order.paymentProvider,
+      payment_proof_url: order.paymentProofUrl ?? null,
+    };
+    let { data, error } = await supabaseAdmin.from("orders").insert(fila).select().single();
+    // Base sin la columna product_ref (falta correr supabase/schema.sql): se guarda sin ella.
+    if (error && /product_ref/.test(error.message)) {
+      const { product_ref: _omitida, ...sinRef } = fila;
+      void _omitida;
+      ({ data, error } = await supabaseAdmin.from("orders").insert(sinRef).select().single());
+    }
     if (error || !data) throw new Error(error?.message || "Failed to create order");
     return rowToOrder(data);
   }

@@ -26,6 +26,7 @@ export default function AdminPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [catalogoEnErp, setCatalogoEnErp] = useState(false);
   const [productForm, setProductForm] = useState(EMPTY_PRODUCT_FORM);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [savingProduct, setSavingProduct] = useState(false);
@@ -229,6 +230,7 @@ export default function AdminPage() {
       const res = await fetch("/api/settings");
       const data = await res.json();
       setSettings(data.settings);
+      setCatalogoEnErp(Boolean(data.catalogoEnErp));
     } catch (error) {
       console.error("Error fetching settings:", error);
     }
@@ -409,6 +411,12 @@ export default function AdminPage() {
 
             {tab === "products" && (
               <div className="space-y-6">
+                {catalogoEnErp && (
+                  <div className="p-4 rounded-2xl border border-accent/30 bg-accent/5 text-sm">
+                    <b>El catálogo de la tienda se gestiona en el ERP</b> (Tienda → Productos de tienda): precios, stock, fotos y el contenido de cada landing.
+                    Lo que edites aquí solo se usa si el ERP no responde.
+                  </div>
+                )}
                 <div className="p-6 rounded-2xl bg-surface border border-border">
                   <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
                     <Box className="w-5 h-5 text-accent-light" />
