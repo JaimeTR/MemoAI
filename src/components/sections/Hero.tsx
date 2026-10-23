@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/Badge";
 import { FloatingProduct } from "@/components/product/FloatingProduct";
 import { Logo } from "@/components/ui/Logo";
 import { PRODUCT } from "@/lib/constants";
+import { usePrecio } from "@/components/memoai/precio";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +21,7 @@ interface HeroProps {
 }
 
 export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
+  const precio = usePrecio();
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -105,10 +107,10 @@ export function Hero({ onBuyClick, onVideoClick }: HeroProps) {
             <div ref={ctaRef} className="flex flex-col items-center md:items-start gap-3 mb-6">
               <div className="flex items-baseline gap-2 md:gap-3">
                 <span className="text-text-muted line-through text-sm md:text-lg">
-                  {PRODUCT.currency} {PRODUCT.originalPrice}
+                  {precio.currency} {precio.originalPrice}
                 </span>
                 <span className="text-3xl md:text-5xl font-bold">
-                  {PRODUCT.currency} {PRODUCT.salePrice}
+                  {precio.currency} {precio.salePrice}
                 </span>
                 <span className="self-start text-[11px] md:text-sm font-bold px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-full bg-accent text-white">
                   60% OFF

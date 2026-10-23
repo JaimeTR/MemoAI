@@ -1,27 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { validarCupon } from "@/lib/cupones";
 import { isRateLimited, tooManyRequests } from "@/lib/rate-limit";
 
+/** El checkout valida el cupon antes de pedir. El descuento real se vuelve a calcular al crear el pedido. */
 export async function POST(request: NextRequest) {
   if (isRateLimited(request, "coupon", 30, 10 * 60_000)) return tooManyRequests();
-  const body = await request.json();
-  const code = (body.code || "").trim();
-  const amount = typeof body.amount === "number" ? body.amount : 0;
-
-  if (!code) {
-    return NextResponse.json({ valid: false, error: "Ingresa un código" }, { status: 400 });
-  }
-
-  const coupon = await db.getCoupon(code);
-
-  if (!coupon || !coupon.active) {
-    return NextResponse.json({ valid: false, error: "Cupón inválido o vencido" }, { status: 404 });
-  }
-
-  const discount =
-    coupon.type === "percent"
-      ? Math.round((amount * coupon.value) / 100)
-      : Math.min(coupon.value, amount);
-
-  return NextResponse.json({ valid: true, coupon, discount });
+  const body = await request.json().catch(() => ({}));
+  const code = typeof body.code === "string" ? body.code : "";
+  const amount = typeof body.amount === "number" && body.amount > 0 ? body.amount : 0;
+  const r = await validarCupon(code, amount);
+  if (!r.ok) return NextResponse.json({ valid: false, error: r.error }, { status: code.trim() ? 404 : 400 });
+  return NextResponse.json({ valid: true, coupon: r.cupon, discount: r.cupon.discount });
 }

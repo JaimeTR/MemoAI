@@ -52,6 +52,8 @@ create table if not exists products (
 
 alter table orders add column if not exists product_id uuid references products(id) on delete set null;
 alter table orders add column if not exists payment_proof_url text;
+-- Id del producto en el catalogo del ERP (o de products). Lo que se le manda al ERP en cada pedido.
+alter table orders add column if not exists product_ref text;
 
 create table if not exists coupons (
   code text primary key,

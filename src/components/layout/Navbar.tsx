@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -82,6 +83,9 @@ export function Navbar({ onBuyClick }: NavbarProps) {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-6">
+              <Link href="/" className="text-sm text-text-muted hover:text-foreground transition-colors">
+                ← TIENDA
+              </Link>
               {navItems.map((item) => (
                 <button
                   key={item.label}
@@ -125,6 +129,9 @@ export function Navbar({ onBuyClick }: NavbarProps) {
             <a href="#" className="mb-2" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); setMobileOpen(false); }}>
                 <Logo size="lg" />
               </a>
+            <Link href="/" className="text-xl font-medium text-text-muted hover:text-foreground transition-colors">
+              ← TIENDA
+            </Link>
             {navItems.map((item) => (
               <button
                 key={item.label}

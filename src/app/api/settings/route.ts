@@ -1,15 +1,7 @@
-import { requireAdmin } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { obtenerAjustes } from "@/lib/ajustes";
 
+/** Datos de pago y contacto para el checkout y el boton de WhatsApp. Se editan en el ERP (Ajustes de tienda). */
 export async function GET() {
-  return NextResponse.json({ settings: await db.getSettings() });
-}
-
-export async function PUT(request: Request) {
-  const denied = await requireAdmin();
-  if (denied) return denied;
-  const body = await request.json();
-  const settings = await db.updateSettings(body);
-  return NextResponse.json({ settings });
+  return NextResponse.json({ settings: await obtenerAjustes() });
 }
